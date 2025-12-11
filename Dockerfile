@@ -1,2 +1,2 @@
 FROM tomcat:latest
-COPY target/*.war /usr/local/tomact/webapps/
+COPY target/mana.war /usr/local/tomact/webapps/mama.war
