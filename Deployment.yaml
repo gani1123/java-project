@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mama
-        image: your-docker-username/image3
+        image: ganeshh/image3:latest
         ports:
         - containerPort: 8080
 ---
