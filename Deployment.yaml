@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mama
-        image: ganeshh/image3:latest
+        image: ganeshnalli/image3:latest
         ports:
         - containerPort: 8080
 ---
