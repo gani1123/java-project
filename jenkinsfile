@@ -2,46 +2,27 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk17'
-        maven 'maven3'
+        maven 'Maven'   // Make sure Maven is configured in Jenkins
+        jdk 'Java'      // Make sure JDK is configured
     }
 
     stages {
-
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/gani1123/java-project.git'
+                git 'https://github.com/gani1123/java-project.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean install'
             }
         }
 
-        
-
-        stage('Deploy') {
+        stage('Test') {
             steps {
-                deploy adapters: [
-                    tomcat9(
-                        credentialsId: '181d2b5b-5622-4ee0-baf7-88f09d9f9382',
-                        url: 'http://13.205.13.55:9090/'
-                    )
-                ],
-                contextPath: '2048game',
-                war: '**/*.war'
+                sh 'mvn test'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Build completed successfully ✅'
-        }
-        failure {
-            echo 'Build failed ❌'
         }
     }
 }
