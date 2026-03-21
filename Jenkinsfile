@@ -2,27 +2,32 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'   // Make sure Maven is configured in Jenkins
-        jdk 'Java'      // Make sure JDK is configured
+        jdk 'jdk17'
+        maven 'maven3'
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/gani1123/java-project.git'
+                git branch: 'main', url: 'https://github.com/gani1123/java-project.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                sh 'mvn clean package'
             }
         }
 
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
+        
+
+    post {
+        success {
+            echo 'Build completed successfully ✅'
+        }
+        failure {
+            echo 'Build failed ❌'
         }
     }
 }
