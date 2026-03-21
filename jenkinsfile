@@ -1,1 +1,47 @@
+pipeline {
+    agent any
 
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/gani1123/java-project.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        
+
+        stage('Deploy') {
+            steps {
+                deploy adapters: [
+                    tomcat9(
+                        credentialsId: '181d2b5b-5622-4ee0-baf7-88f09d9f9382',
+                        url: 'http://13.205.13.55:9090/'
+                    )
+                ],
+                contextPath: '2048game',
+                war: '**/*.war'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build completed successfully ✅'
+        }
+        failure {
+            echo 'Build failed ❌'
+        }
+    }
+}
