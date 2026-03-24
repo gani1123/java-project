@@ -1,35 +1,29 @@
 pipeline {
-    agent any
+    agent { label 'linux' } // run on your agent
 
-    tools {
-        jdk 'jdk17'
-        maven 'maven3'
+    environment {
+        TF_VAR_region = 'ap-south-1'
     }
 
     stages {
-
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/gani1123/java-project.git'
+                git branch: 'main', url: 'https://github.com/gani1123/terraform.git'
             }
         }
 
-        stage('Build') {
+        stage('Terraform Init') {
             steps {
-                sh 'mvn clean package'
+                sh 'terraform init'
             }
         }
 
-    }  // ✅ THIS WAS MISSING
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan -out=tfplan'
+            }
+        }
 
-    post {
-        success {
-            echo 'Build completed successfully ✅'
-        }
-        failure {
-            echo 'Build failed ❌'
-        }
+        
     }
-
-    
 }
