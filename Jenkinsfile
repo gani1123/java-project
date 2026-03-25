@@ -1,6 +1,11 @@
 @Library('my-shared-library') _
 
 pipeline {
+    agent { label 'linux' } // run on your agent
+
+    environment {
+        TF_VAR_region = 'ap-south-1'
+    }
     stages {
         stage('Checkout') {
             steps {
