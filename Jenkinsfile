@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                gitCheckout('https://github.com/yourrepo.git', 'main')
+                gitCheckout('https://github.com/gani1123/java-project.git', 'main')
             }
         }
         stage('Build') {
