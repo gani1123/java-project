@@ -1,4 +1,4 @@
-@Library('my-Shared-Library') _
+@Library('my-shared-library') _
 
 pipeline {
     stages {
