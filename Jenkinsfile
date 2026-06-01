@@ -3,7 +3,7 @@
 pipeline {
     agent any
     environment {
-        TF_VAR_region = 'ap-south-1'
+        TF_VAR_region = 'us-east-1'
     }
     stages {
         stage('Checkout') {
