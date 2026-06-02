@@ -1,10 +1,18 @@
 def call() {
 
-    sh '''
-        kubectl apply -f Deployment.yaml
-    '''
+    withCredentials([[
+        $class: 'AmazonWebServicesCredentialsBinding',
+        credentialsId: 'AWS-cred'
+    ]]) {
 
-    sh '''
-        kubectl rollout status deployment/web-app
-    '''
+        sh '''
+            aws eks update-kubeconfig \
+            --region us-east-1 \
+            --name dev-eks
+
+            kubectl apply -f Deployment.yaml
+
+            kubectl rollout status deployment/web-app --timeout=300s
+        '''
+    }
 }
