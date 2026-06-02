@@ -1,19 +1,20 @@
-def call(String imageName) {
+def call() {
 
-    def region = "us-east-1"
-    def accountId = "962800862954"
-    def repo = "${accountId}.dkr.ecr.${region}.amazonaws.com/myapp"
+    def repository =
+        "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.APP_NAME}"
 
-    sh """
-        echo "Logging into AWS ECR..."
-        aws ecr get-login-password --region ${region} \
-        | docker login --username AWS --password-stdin ${accountId}.dkr.ecr.${region}.amazonaws.com
+    withCredentials([[
+        \$class: 'AmazonWebServicesCredentialsBinding',
+        credentialsId: 'AWS-cred'
+    ]]) {
 
-        echo "Tagging image..."
-        docker tag ${imageName} ${repo}:latest
+        sh """
+            aws ecr get-login-password --region ${env.AWS_REGION} | \
+            docker login --username AWS --password-stdin \
+            ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com
 
-        echo "Pushing image to ECR..."
-        docker push ${repo}:latest
-    """
+            docker push ${repository}:${env.BUILD_NUMBER}
+            docker push ${repository}:latest
+        """
+    }
 }
-
