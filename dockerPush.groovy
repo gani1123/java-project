@@ -1,10 +1,20 @@
-def call(imageName) {
+def call() {
 
-    sh '''
-        aws ecr get-login-password --region us-east-1 | \
-        docker login --username AWS --password-stdin \
-        962800862954.dkr.ecr.us-east-1.amazonaws.com
-    '''
+    def repository =
+        "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.APP_NAME}"
 
-    sh "docker push ${imageName}"
+    withCredentials([[
+        $class: 'AmazonWebServicesCredentialsBinding',
+        credentialsId: 'AWS-cred'
+    ]]) {
+
+        sh """
+            aws ecr get-login-password --region ${env.AWS_REGION} | \
+            docker login --username AWS --password-stdin \
+            ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com
+
+            docker push ${repository}:${env.IMAGE_TAG}
+            docker push ${repository}:latest
+        """
+    }
 }
