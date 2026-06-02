@@ -1,8 +1,10 @@
 def call(imageName) {
-    withCredentials([usernamePassword(credentialsId: 'docker-creds',
-        usernameVariable: 'USER', passwordVariable: 'PASS')]) {
 
-        sh "echo $PASS | docker login -u $USER --password-stdin"
-        sh "docker push ${imageName}"
-    }
+    sh '''
+        aws ecr get-login-password --region us-east-1 | \
+        docker login --username AWS --password-stdin \
+        962800862954.dkr.ecr.us-east-1.amazonaws.com
+    '''
+
+    sh "docker push ${imageName}"
 }
