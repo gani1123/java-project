@@ -1,20 +1,14 @@
-def call() {
+withCredentials([[
+    $class: 'AmazonWebServicesCredentialsBinding',
+    credentialsId: 'AWS-cred'
+]]) {
 
-    def repository =
-        "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.APP_NAME}"
+    sh """
+        aws ecr get-login-password --region ${env.AWS_REGION} | \
+        docker login --username AWS --password-stdin \
+        ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com
 
-    withCredentials([[
-        $class: 'AmazonWebServicesCredentialsBinding',
-        credentialsId: 'AWS-cred'
-    ]]) {
-
-        sh """
-            aws ecr get-login-password --region ${env.AWS_REGION} | \
-            docker login --username AWS --password-stdin \
-            ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com
-
-            docker push ${repository}:${env.IMAGE_TAG}
-            docker push ${repository}:latest
-        """
-    }
+        docker push ${repository}:${env.IMAGE_TAG}
+        docker push ${repository}:latest
+    """
 }
