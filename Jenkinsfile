@@ -18,12 +18,13 @@ pipeline {
         }
         stage('Docker Build') {
             steps {
-                dockerBuild('myapp:latest')
+                dockerBuild("${ECR_REPO}:latest")
             }
         }
-        stage('Push') {
+
+        stage('Push to ECR') {
             steps {
-                dockerPush('myapp:latest')
+                dockerPush("${ECR_REPO}:latest")
             }
         }
     }
