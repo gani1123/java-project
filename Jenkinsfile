@@ -2,29 +2,40 @@
 
 pipeline {
     agent any
+
     environment {
-        TF_VAR_region = 'us-east-1'
+        AWS_ACCOUNT_ID = credentials('aws-account-id')
+        AWS_REGION     = 'us-east-1'
+        APP_NAME       = 'myapp'
+        IMAGE_TAG      = "${BUILD_NUMBER}"
     }
+
     stages {
+
         stage('Checkout') {
             steps {
-                gitCheckout('https://github.com/gani1123/java-project.git', 'main')
+                gitCheckout(
+                    'https://github.com/gani1123/java-project.git',
+                    'main'
+                )
             }
         }
+
         stage('Build') {
             steps {
                 mavenBuild()
             }
         }
+
         stage('Docker Build') {
             steps {
-                dockerBuild("${ECR_REPO}:latest")
+                dockerBuild()
             }
         }
 
-        stage('Push to ECR') {
+        stage('Push To ECR') {
             steps {
-                dockerPush("${ECR_REPO}:latest")
+                dockerPush()
             }
         }
     }
