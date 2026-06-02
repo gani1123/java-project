@@ -4,7 +4,7 @@ def call() {
         "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com/${env.APP_NAME}"
 
     withCredentials([[
-        \$class: 'AmazonWebServicesCredentialsBinding',
+        $class: 'AmazonWebServicesCredentialsBinding',
         credentialsId: 'AWS-cred'
     ]]) {
 
