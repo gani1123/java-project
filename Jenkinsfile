@@ -5,12 +5,10 @@ pipeline {
     agent any
 
     environment {
-
         AWS_ACCOUNT_ID = credentials('aws-account-id')
         AWS_REGION     = 'us-east-1'
 
         APP_NAME       = 'myapp'
-
         IMAGE_TAG      = "${BUILD_NUMBER}"
     }
 
@@ -20,6 +18,7 @@ pipeline {
 
     stages {
 
+        // ✅ Checkout
         stage('Checkout') {
             steps {
                 gitCheckout(
@@ -29,30 +28,49 @@ pipeline {
             }
         }
 
+        // ✅ Build (Maven)
         stage('Build') {
             steps {
                 mavenBuild()
             }
         }
 
+        // ✅ Trivy FS Scan (code + dependencies)
+        stage('Trivy FS Scan') {
+            steps {
+                trivyScan()
+            }
+        }
+
+        // ✅ Docker Build
         stage('Docker Build') {
             steps {
                 dockerBuild()
             }
         }
 
+        // ✅ Trivy Image Scan (container security)
+        stage('Trivy Image Scan') {
+            steps {
+                trivyScan("${APP_NAME}", "${IMAGE_TAG}")
+            }
+        }
+
+        // ✅ Push image to ECR
         stage('Push To ECR') {
             steps {
                 dockerPush()
             }
         }
 
+        // ✅ Update Kubernetes manifest
         stage('Update Manifest') {
             steps {
                 updateManifest()
             }
         }
 
+        // ✅ Deploy to EKS
         stage('Deploy To EKS') {
             steps {
                 k8sDeploy()
@@ -63,11 +81,11 @@ pipeline {
     post {
 
         success {
-            echo "Deployment Successful"
+            echo "✅ Deployment Successful"
         }
 
         failure {
-            echo "Deployment Failed"
+            echo "❌ Deployment Failed (Check Trivy or Build logs)"
         }
 
         always {
