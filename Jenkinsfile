@@ -52,10 +52,13 @@ pipeline {
 
         // ✅ Trivy Image Scan (container security)
         stage('Trivy Image Scan') {
-            steps {
-                trivyScan("${APP_NAME}", "${IMAGE_TAG}")
-            }
-        }
+           steps {
+            trivyScan(
+            "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}",
+            "${IMAGE_TAG}"
+        )
+    }
+}
 
         // ✅ Push image to ECR
         stage('Push To ECR') {
