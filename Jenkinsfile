@@ -10,6 +10,7 @@ pipeline {
 
         APP_NAME       = 'myapp'
         IMAGE_TAG      = "${BUILD_NUMBER}"
+        REPOSITORY     = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/myapp"
     }
 
     options {
