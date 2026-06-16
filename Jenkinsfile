@@ -9,6 +9,8 @@ pipeline {
         AWS_REGION     = 'us-east-1'
 
         APP_NAME       = 'myapp'
+        SONAR_HOST_URL = 'http://ec2-32-193-251-152.compute-1.amazonaws.com:9000'
+        NEXUS_REPO_URL = 'http://ec2-32-193-251-152.compute-1.amazonaws.com:8081/repository/maven-releases/'
         IMAGE_TAG      = "${BUILD_NUMBER}"
         REPOSITORY     = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/myapp"
     }
@@ -36,6 +38,20 @@ pipeline {
             }
         }
 
+        // ✅ SonarQube analysis
+        stage('SonarQube Analysis') {
+            steps {
+                sonarQubeAnalysis()
+            }
+        }
+
+        // ✅ Nexus deploy
+        stage('Nexus Deploy') {
+            steps {
+                nexusDeploy()
+            }
+        }
+
         // ✅ Trivy FS Scan (code + dependencies)
         stage('Trivy FS Scan') {
             steps {
@@ -52,13 +68,13 @@ pipeline {
 
         // ✅ Trivy Image Scan (container security)
         stage('Trivy Image Scan') {
-           steps {
-            trivyScan(
-            "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}",
-            "${IMAGE_TAG}"
-        )
-    }
-}
+            steps {
+                trivyScan(
+                    "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}",
+                    "${IMAGE_TAG}"
+                )
+            }
+        }
 
         // ✅ Push image to ECR
         stage('Push To ECR') {
